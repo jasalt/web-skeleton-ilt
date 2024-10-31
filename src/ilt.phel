@@ -255,56 +255,54 @@
 # (find-definitions "php/array_merge" nil)
 # (find-definitions "str" nil)
 
-(defn handle-request []
-  (let [request (http/request-from-globals)
-        uri (get request :uri)]
-    (let [operation (json-decode-value (php/json_decode (php/file_get_contents "php://input") true))]
-      (case (get operation :method)
-        "evaluate"
-        (let [expr (first (get operation :params))]
-          (try
-            (let [res (eval (read-string expr))]
-              (jsonrpc-result operation
-                              {:type (type res)
-                               :repr (print-str res)
-                               :kind (ilt-kind-of (type res))}
-                              ))
-            (catch \Exception e
-              (jsonrpc-error operation (php/-> e (getMessage))))))
+(defn handle-request [request]
+  (let [operation (json-decode-value (php/json_decode (php/file_get_contents "php://input") true))]
+    (case (get operation :method)
+      "evaluate"
+      (let [expr (first (get operation :params))]
+        (try
+          (let [res (eval (read-string expr))]
+            (jsonrpc-result operation
+                            {:type (type res)
+                             :repr (print-str res)
+                             :kind (ilt-kind-of (type res))}
+                            ))
+          (catch \Exception e
+            (jsonrpc-error operation (php/-> e (getMessage))))))
 
-        "compile"
-        (let [expr (first (get operation :params))]
-          (try
-            (let [res (compile (read-string expr))]
-              (jsonrpc-result operation res))
-            (catch \Exception e
-              (jsonrpc-error operation (php/-> e (getMessage))))))
+      "compile"
+      (let [expr (first (get operation :params))]
+        (try
+          (let [res (compile (read-string expr))]
+            (jsonrpc-result operation res))
+          (catch \Exception e
+            (jsonrpc-error operation (php/-> e (getMessage))))))
 
-        "complete"
-        (let [what (first (get operation :params))]
-          (jsonrpc-result operation (complete what)))
+      "complete"
+      (let [what (first (get operation :params))]
+        (jsonrpc-result operation (complete what)))
 
-        "get_definition_properties"
-        (let [def (first (get operation :params))
-              props (second (get operation :params))]
-          (jsonrpc-result operation (definition-properties def props)))
+      "get_definition_properties"
+      (let [def (first (get operation :params))
+            props (second (get operation :params))]
+        (jsonrpc-result operation (definition-properties def props)))
 
-        "apropos"
-        (let [what (first (get operation :params))]
-          (jsonrpc-result operation (apropos what)))
+      "apropos"
+      (let [what (first (get operation :params))]
+        (jsonrpc-result operation (apropos what)))
 
-        "find_definitions"
-        (let [name (get (get operation :params) 0)
-              module (get (get operation :params) 1)
-              type (get (get operation :params) 2)]
-          (jsonrpc-result operation (find-definitions name type)))
+      "find_definitions"
+      (let [name (get (get operation :params) 0)
+            module (get (get operation :params) 1)
+            type (get (get operation :params) 2)]
+        (jsonrpc-result operation (find-definitions name type)))
 
-        true
-        (print "Error: invalid operation"))
+      true
+      (print "Error: invalid operation"))
 
-      # We handled the ILT jsonrpc request. Quit now.
-      (php/exit 0)
-      )))
+    # We handled the ILT jsonrpc request. Quit now.
+    (php/exit 0)
+    ))
 
 ## Handle requests
 
