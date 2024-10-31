@@ -1,5 +1,4 @@
-(ns phel-scaffolding\web\views\main
-  (:require phel\html :refer [html doctype])
+(ns web-skeleton\ilt
   (:require phel\http))
 
 # Utils
