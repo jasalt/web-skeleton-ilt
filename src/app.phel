@@ -1,5 +1,6 @@
 (ns web-skeleton\app
   (:require web-skeleton\controller\routes)
+  (:require web-skeleton\ilt)
   (:require phel\router :as r)
   (:require phel\http :as h))
 
