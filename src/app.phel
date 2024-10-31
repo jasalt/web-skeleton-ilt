@@ -8,6 +8,8 @@
   (r/handler
    (r/router
     [["/" {:handler routes/index-handler}]
+     ["/ilt" {:name ::ilt
+              :post {:handler ilt/handle-request}}]
      ["/ping" {:name ::ping
                :get {:handler routes/ping-handler}
                :post {:handler routes/ping-handler}}]])))
